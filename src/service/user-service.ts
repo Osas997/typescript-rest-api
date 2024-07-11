@@ -1,6 +1,10 @@
 import { prisma } from "../app/database";
 import { ResponseError } from "../error/response-error";
-import type { UserRequest, UserResponse } from "../model/user-model";
+import type {
+  RefreshRequest,
+  UserRequest,
+  UserResponse,
+} from "../model/user-model";
 import { JwtToken } from "../utils/jwt";
 import { UserValidation } from "../validation/user-validation";
 import { validate } from "../validation/validation";
@@ -48,6 +52,44 @@ export class UserService {
 
     if (!password) {
       throw new ResponseError("Invalid username or password", 404);
+    }
+
+    const token = JwtToken.generateToken(
+      user.id,
+      process.env.SECRET_KEY!,
+      "1h"
+    );
+
+    const refreshToken = JwtToken.generateToken(
+      user.id,
+      process.env.SECRET_KEY!,
+      "7d"
+    );
+
+    return {
+      name: user.name,
+      username: user.username,
+      token: token,
+      refreshToken: refreshToken,
+    };
+  }
+
+  static async refresh(req: RefreshRequest): Promise<any> {
+    const refreshRequest = validate(UserValidation.REFRESH, req);
+
+    const payload = JwtToken.verifyToken(
+      refreshRequest.token,
+      process.env.SECRET_KEY!
+    );
+
+    const user = await prisma.user.findUnique({
+      where: {
+        id: payload.id,
+      },
+    });
+
+    if (payload === null || user === null) {
+      throw new ResponseError("Invalid token", 401);
     }
 
     const token = JwtToken.generateToken(

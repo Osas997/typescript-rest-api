@@ -83,3 +83,54 @@ describe("POST /api/login", () => {
     expect(response.body.error).toBeDefined();
   });
 });
+
+describe("POST /api/refresh", () => {
+  it("should refresh token successfully", async () => {
+    const responseLogin = await supertest(app).post("/api/login").send({
+      username: "ciwiz1234",
+      password: "emanslur",
+    });
+
+    const refreshToken = responseLogin.body.data.refreshToken;
+
+    const response = await supertest(app).post("/api/refresh").send({
+      token: refreshToken,
+    });
+
+    expect(response.statusCode).toBe(200);
+    expect(response.body.data.token).toBeDefined();
+    expect(response.body.error).toBeUndefined();
+  });
+
+  it("should refresh token failed if token field is empty", async () => {
+    const responseLogin = await supertest(app).post("/api/login").send({
+      username: "ciwiz1234",
+      password: "emanslur",
+    });
+
+    const refreshToken = responseLogin.body.data.refreshToken;
+
+    const response = await supertest(app).post("/api/refresh").send({});
+
+    expect(response.statusCode).toBe(422);
+    expect(response.body.error).toBeDefined();
+  });
+
+  it("should refresh token failed if token is invalid", async () => {
+    const responseLogin = await supertest(app).post("/api/login").send({
+      username: "ciwiz1234",
+      password: "emanslur",
+    });
+
+    const refreshToken = responseLogin.body.data.refreshToken;
+
+    const response = await supertest(app)
+      .post("/api/refresh")
+      .send({
+        token: refreshToken + "invalid",
+      });
+
+    expect(response.statusCode).toBe(401);
+    expect(response.body.error).toBeDefined();
+  });
+});

@@ -5,3 +5,4 @@ export const publicRoute = express.Router();
 
 publicRoute.post("/register", UserController.register);
 publicRoute.post("/login", UserController.login);
+publicRoute.post("/refresh", UserController.refresh);
