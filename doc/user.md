@@ -66,6 +66,38 @@ Response body (if failed):
 }
 ```
 
+## Refresh Token
+
+Endpoint : POST `/api/refresh`
+
+Request body:
+
+```json
+{
+  "refreshToken": "423423424232"
+}
+```
+
+Response body (if successful):
+
+```json
+{
+  "data": {
+    "username": "ciwis",
+    "password": "password",
+    "token": "423423424232"
+  }
+}
+```
+
+Response body (if failed):
+
+```json
+{
+  "error": "Invalid token"
+}
+```
+
 ## Get User
 
 Endpoint : GET `/api/current`
