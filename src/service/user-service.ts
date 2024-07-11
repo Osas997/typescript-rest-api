@@ -66,6 +66,15 @@ export class UserService {
       "7d"
     );
 
+    await prisma.user.update({
+      where: {
+        id: user.id,
+      },
+      data: {
+        refresh_token: refreshToken,
+      },
+    });
+
     return {
       name: user.name,
       username: user.username,
@@ -74,7 +83,8 @@ export class UserService {
     };
   }
 
-  static async refresh(req: RefreshRequest): Promise<any> {
+  // CARA YANG KURANG AMAN HARUS DISIMPAN DI DB DAN DIVALIDASI
+  static async refresh(req: RefreshRequest): Promise<UserResponse> {
     const refreshRequest = validate(UserValidation.REFRESH, req);
 
     const payload = JwtToken.verifyToken(
@@ -88,14 +98,18 @@ export class UserService {
       },
     });
 
-    if (payload === null || user === null) {
+    if (
+      payload === null ||
+      user === null ||
+      user.refresh_token !== refreshRequest.token
+    ) {
       throw new ResponseError("Invalid token", 401);
     }
 
     const token = JwtToken.generateToken(
       user.id,
       process.env.SECRET_KEY!,
-      "1h"
+      "20m"
     );
 
     return {
