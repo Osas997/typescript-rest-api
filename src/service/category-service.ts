@@ -40,7 +40,7 @@ export class CategoryService {
 
     let SLUG = category.slug;
     if (categoryRequest.name !== category.name) {
-      SLUG = await this.generateSlug(categoryRequest.name, category.id);
+      SLUG = await this.generateSlug(categoryRequest.name);
     }
 
     category = await prisma.category.update({
@@ -80,10 +80,10 @@ export class CategoryService {
     return category;
   }
 
-  static async generateSlug(name: string, id?: number): Promise<string> {
+  static async generateSlug(name: string): Promise<string> {
     let newSlug = slug(name);
 
-    const slugFilter = id ? { slug: newSlug, NOT: { id } } : { slug: newSlug };
+    const slugFilter = { slug: newSlug };
 
     let sameSlug = await prisma.category.findFirst({
       where: slugFilter,

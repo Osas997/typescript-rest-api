@@ -48,9 +48,9 @@ export class CategoryController {
     try {
       const slug = req.params.slug;
 
-      const category = await CategoryService.deleteCategory(slug);
+      await CategoryService.deleteCategory(slug);
 
-      res.status(201).send({ message: "Category deleted" });
+      res.status(200).send({ message: "Category deleted" });
     } catch (error) {
       next(error);
     }
