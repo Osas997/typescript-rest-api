@@ -83,43 +83,19 @@ export class CategoryService {
   static async generateSlug(name: string, id?: number): Promise<string> {
     let newSlug = slug(name);
 
-    if (id) {
-      let sameSlug = await prisma.category.findFirst({
-        where: {
-          slug: newSlug,
-          NOT: {
-            id: id,
-          },
-        },
-      });
+    const slugFilter = id ? { slug: newSlug, NOT: { id } } : { slug: newSlug };
 
-      while (sameSlug) {
-        newSlug = `${newSlug}-${Math.floor(Math.random() * 1000)}`;
-        sameSlug = await prisma.category.findFirst({
-          where: {
-            slug: newSlug,
-            NOT: {
-              id: id,
-            },
-          },
-        });
-      }
-    } else {
-      let sameSlug = await prisma.category.findFirst({
-        where: {
-          slug: newSlug,
-        },
-      });
+    let sameSlug = await prisma.category.findFirst({
+      where: slugFilter,
+    });
 
-      while (sameSlug) {
-        newSlug = `${newSlug}-${Math.floor(Math.random() * 1000)}`;
-        sameSlug = await prisma.category.findFirst({
-          where: {
-            slug: newSlug,
-          },
-        });
-      }
+    while (sameSlug) {
+      newSlug = `${newSlug}-${Math.floor(Math.random() * 1000)}`;
+      sameSlug = await prisma.category.findFirst({
+        where: { slug: newSlug },
+      });
     }
+
     return newSlug;
   }
 }
