@@ -3,3 +3,7 @@ export type CategoryResponse = {
   name: string;
   slug: string;
 };
+
+export type CategoryRequest = {
+  name: string;
+};

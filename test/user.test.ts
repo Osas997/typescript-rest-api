@@ -60,6 +60,7 @@ describe("POST /api/login", () => {
 
     expect(response.statusCode).toBe(200);
     expect(response.body.data.token).toBeDefined();
+    expect(response.body.data.refreshToken).toBeDefined();
     expect(response.body.error).toBeUndefined();
   });
 
@@ -129,6 +130,31 @@ describe("POST /api/refresh", () => {
       .send({
         token: refreshToken + "invalid",
       });
+
+    expect(response.statusCode).toBe(401);
+    expect(response.body.error).toBeDefined();
+  });
+
+  it("should refresh token failed if refresh token database is invalid / null", async () => {
+    const responseLogin = await supertest(app).post("/api/login").send({
+      username: "ciwiz1234",
+      password: "emanslur",
+    });
+
+    const refreshToken = responseLogin.body.data.refreshToken;
+
+    await prisma.user.update({
+      where: {
+        username: "ciwiz1234",
+      },
+      data: {
+        refresh_token: null,
+      },
+    });
+
+    const response = await supertest(app).post("/api/refresh").send({
+      token: refreshToken,
+    });
 
     expect(response.statusCode).toBe(401);
     expect(response.body.error).toBeDefined();

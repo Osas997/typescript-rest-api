@@ -1,6 +1,7 @@
 import type { NextFunction, Request, Response } from "express";
 import { UserService } from "../service/user-service";
 import type { RefreshRequest, UserRequest } from "../model/user-model";
+import type { Request as JWTRequest } from "express-jwt";
 
 export class UserController {
   static async register(req: Request, res: Response, next: NextFunction) {
@@ -38,6 +39,18 @@ export class UserController {
       const user = await UserService.refresh(request);
       res.status(200).send({
         data: user,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async logout(req: JWTRequest, res: Response, next: NextFunction) {
+    try {
+      const { id } = req.auth!;
+      await UserService.logout(id);
+      res.status(200).send({
+        message: "Logout success",
       });
     } catch (error) {
       next(error);

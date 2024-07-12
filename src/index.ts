@@ -1,26 +1,15 @@
 import express from "express";
 import cors from "cors";
-import { publicRoute } from "./router/public-route";
 import { errorMiddleware } from "./middleware/error-middleware";
-import { expressjwt, type Request as JWTRequest } from "express-jwt";
-import { isAdmin } from "./middleware/isadmin-middleware";
+import router from "./router/routes";
 
 export const app = express();
 const port = process.env.PORT || 8000;
-const secret = process.env.SECRET_KEY!;
 
 app.use(express.json());
 app.use(express.static("public"));
 app.use(cors());
-app.use("/api", publicRoute);
-
-app.get(
-  "/api/me",
-  expressjwt({ secret: secret, algorithms: ["HS256"] }),
-  (req: JWTRequest, res) => {
-    res.send(req.auth);
-  }
-);
+app.use("/api", router);
 
 app.get("/", (req, res) => {
   res.send("Hello World! ppk");

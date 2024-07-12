@@ -56,13 +56,13 @@ export class UserService {
 
     const token = JwtToken.generateToken(
       user.id,
-      process.env.SECRET_KEY!,
-      "1h"
+      process.env.ACCESS_SECRET_KEY!,
+      "20m"
     );
 
     const refreshToken = JwtToken.generateToken(
       user.id,
-      process.env.SECRET_KEY!,
+      process.env.REFRESH_SECRET_KEY!,
       "7d"
     );
 
@@ -89,7 +89,7 @@ export class UserService {
 
     const payload = JwtToken.verifyToken(
       refreshRequest.token,
-      process.env.SECRET_KEY!
+      process.env.REFRESH_SECRET_KEY!
     );
 
     const user = await prisma.user.findUnique({
@@ -108,7 +108,7 @@ export class UserService {
 
     const token = JwtToken.generateToken(
       user.id,
-      process.env.SECRET_KEY!,
+      process.env.ACCESS_SECRET_KEY!,
       "20m"
     );
 
@@ -117,5 +117,16 @@ export class UserService {
       username: user.username,
       token: token,
     };
+  }
+
+  static async logout(userId: number): Promise<void> {
+    await prisma.user.update({
+      where: {
+        id: userId,
+      },
+      data: {
+        refresh_token: null,
+      },
+    });
   }
 }
