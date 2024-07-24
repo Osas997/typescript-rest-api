@@ -83,7 +83,6 @@ export class UserService {
     };
   }
 
-  // CARA YANG KURANG AMAN HARUS DISIMPAN DI DB DAN DIVALIDASI
   static async refresh(req: RefreshRequest): Promise<UserResponse> {
     const refreshRequest = validate(UserValidation.REFRESH, req);
 
@@ -128,5 +127,21 @@ export class UserService {
         refresh_token: null,
       },
     });
+  }
+
+  static async me(userId: number): Promise<UserResponse> {
+    const user = await prisma.user.findUnique({
+      where: {
+        id: userId,
+      },
+      select: {
+        name: true,
+        username: true,
+        role: true,
+        created_at: true
+      }
+    });
+
+    return user!;
   }
 }

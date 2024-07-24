@@ -7,16 +7,11 @@ export const app = express();
 const port = process.env.PORT || 8000;
 
 app.use(express.json());
-app.use(express.static("public"));
+app.use("/public", express.static("public"));
 app.use(cors());
 app.use("/api", router);
 
-app.get("/", (req, res) => {
-  res.send("Hello World! ppk");
-});
-
 app.use(errorMiddleware);
-
 app.listen(port, () => {
   console.log("Listening on port " + port);
 });

@@ -66,7 +66,7 @@ Response body:
 
 ## Get Post By Category
 
-Endpoint : GET `/api/posts/{category}`
+Endpoint : GET `/api/all-posts?category={slug}`
 
 Response body:
 

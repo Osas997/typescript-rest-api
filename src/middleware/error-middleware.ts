@@ -2,6 +2,7 @@ import type { NextFunction, Request, Response } from "express";
 import { ResponseError } from "../error/response-error";
 import { ZodError } from "zod";
 import { UnauthorizedError } from "express-jwt";
+import fs from "fs";
 
 export const errorMiddleware = (
   error: Error,
@@ -9,6 +10,14 @@ export const errorMiddleware = (
   res: Response,
   next: NextFunction
 ) => {
+  if (req.file) {
+    fs.unlink(req.file.path, (err) => {
+      if (err) {
+        console.error("Failed to delete file:", err);
+      }
+    });
+  }
+
   if (error instanceof ResponseError) {
     res.status(error.status).json({
       error: error.message,

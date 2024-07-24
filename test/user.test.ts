@@ -104,13 +104,6 @@ describe("POST /api/refresh", () => {
   });
 
   it("should refresh token failed if token field is empty", async () => {
-    const responseLogin = await supertest(app).post("/api/login").send({
-      username: "ciwiz1234",
-      password: "emanslur",
-    });
-
-    const refreshToken = responseLogin.body.data.refreshToken;
-
     const response = await supertest(app).post("/api/refresh").send({});
 
     expect(response.statusCode).toBe(422);
@@ -155,6 +148,33 @@ describe("POST /api/refresh", () => {
     const response = await supertest(app).post("/api/refresh").send({
       token: refreshToken,
     });
+
+    expect(response.statusCode).toBe(401);
+    expect(response.body.error).toBeDefined();
+  });
+});
+describe("GET /api/me", () => {
+  it("should got current user successfully", async () => {
+    const responseLogin = await supertest(app).post("/api/login").send({
+      username: "ciwiz1234",
+      password: "emanslur",
+    });
+
+    const token = responseLogin.body.data.token;
+
+    const response = await supertest(app)
+      .get("/api/me")
+      .set("Authorization", `Bearer ${token}`);
+
+    expect(response.statusCode).toBe(200);
+    expect(response.body.data.username).toBeDefined();
+    expect(response.body.error).toBeUndefined();
+  });
+
+  it("should got current user failed if token is invalid", async () => {
+    const response = await supertest(app)
+      .get("/api/me")
+      .set("Authorization", `Bearer invalidtoken`);
 
     expect(response.statusCode).toBe(401);
     expect(response.body.error).toBeDefined();

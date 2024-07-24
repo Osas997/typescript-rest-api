@@ -1,6 +1,5 @@
 import type { NextFunction, Request, Response } from "express";
 import { CategoryService } from "../service/category-service";
-import type { Request as JWTRequest } from "express-jwt";
 import type { CategoryRequest } from "../model/category-model";
 
 export class CategoryController {
@@ -38,7 +37,7 @@ export class CategoryController {
 
       const category = await CategoryService.updateCategory(slug, request);
 
-      res.status(201).send({ data: category });
+      res.status(200).send({ data: category });
     } catch (error) {
       next(error);
     }

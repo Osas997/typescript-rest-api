@@ -33,7 +33,7 @@ export class CategoryService {
   static async updateCategory(
     slugParam: string,
     req: CategoryRequest
-  ): Promise<CategoryResponse> {
+  ): Promise<any> {
     let category = await this.getCategoryBySlug(slugParam);
 
     const categoryRequest = validate(CategoryValidation.CREATE, req);
@@ -43,14 +43,13 @@ export class CategoryService {
       SLUG = await this.generateSlug(categoryRequest.name);
     }
 
+    categoryRequest.slug = SLUG;
+
     category = await prisma.category.update({
       where: {
         slug: slugParam,
       },
-      data: {
-        name: categoryRequest.name,
-        slug: SLUG,
-      },
+      data: categoryRequest,
     });
 
     return category;

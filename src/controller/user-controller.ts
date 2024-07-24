@@ -56,4 +56,16 @@ export class UserController {
       next(error);
     }
   }
+
+  static async me(req: JWTRequest, res: Response, next: NextFunction) {
+    try {
+      const { id } = req.auth!;
+      const user = await UserService.me(id);
+      res.status(200).send({
+        data: user,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
 }
